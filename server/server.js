@@ -16,7 +16,7 @@ app.use(express.json());
 // Log the MongoDB URI for debugging
 console.log("MongoDB URI:", process.env.MONGODB_URI);
 
-// Connect to MongoDB
+// Connectto MongoDB
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log("MongoDB connected"))
