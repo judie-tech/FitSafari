@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import mongoose from "mongoose"; // Import mongoose
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -12,4 +12,4 @@ const userSchema = new mongoose.Schema({
   dietaryPreferences: { type: String },
 });
 
-export const User = model("User", userSchema);
+export const User = mongoose.model("User", userSchema); // Use mongoose for the model
