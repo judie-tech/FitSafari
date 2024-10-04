@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import userRoutes from "./routes/auth.js";
+import authRoutes from "./routes/auth.js";
+import profileRoutes from "./routes/profile.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -16,6 +18,8 @@ app.use(express.json());
 
 // Use your user routes
 app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/profile", profileRoutes);
 
 // Log the MongoDB URI for debugging
 console.log("MongoDB URI:", process.env.MONGODB_URI);
