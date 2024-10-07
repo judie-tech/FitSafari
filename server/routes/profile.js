@@ -1,5 +1,6 @@
 import express from "express";
 import User from "../models/users.js";
+
 import authMiddleware from "../middleware/auth.js"; // Implement this middleware for token validation
 const router = express.Router();
 

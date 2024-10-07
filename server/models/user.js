@@ -1,4 +1,5 @@
 import mongoose from "mongoose"; // Import mongoose
+import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -12,5 +13,11 @@ const userSchema = new mongoose.Schema({
   dietaryPreferences: { type: String },
 });
 
-export const User = mongoose.model("User", userSchema); // Use mongoose for the model
-export default User;
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+  next();
+});
+
+export default mongoose.model("User", userSchema);
