@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import { generateToken, verifyToken } from "../utilis/jwtUtils.js";
+import bcrypt from "bcrypt";
 
 export const register = async (req, res) => {
   try {
@@ -15,12 +16,26 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+
+    // If user not found
+    if (!user) {
+      console.log("User not found");
       return res.status(401).json({ message: "Invalid credentials" });
     }
+
+    // Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      console.log("Password does not match");
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Generate token
     const token = generateToken(user);
+    console.log("Token generated:", token);
     res.json({ token });
   } catch (error) {
+    console.error("Login error:", error.message);
     res.status(500).json({ message: "Login failed" });
   }
 };
