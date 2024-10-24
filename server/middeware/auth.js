@@ -1,22 +1,19 @@
-import jwt from "jsonwebtoken";
-
-// Middleware function for token authentication
 const authMiddleware = (req, res, next) => {
-  // Get token from the header
-  const token = req.header("x-auth-token");
+  // Get token from Authorization header (Bearer token)
+  const token = req.header("Authorization")?.replace("Bearer ", "");
 
-  // Check if no token
+  // Check if token exists
   if (!token) {
-    return res.status(401).json({ msg: "No token, authorization denied" });
+    return res.status(401).json({ message: "No token, authorization denied" });
   }
 
   // Verify token
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded.user; // Attach the decoded user info to the request
-    next(); // Proceed to the next middleware or route handler
+    req.user = decoded.user; // Attach the decoded user (with userId) to req.user
+    next();
   } catch (err) {
-    res.status(401).json({ msg: "Token is not valid" });
+    res.status(401).json({ message: "Token is not valid" });
   }
 };
 
