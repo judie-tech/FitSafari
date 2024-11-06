@@ -1,22 +1,31 @@
-const Workout = require("../models/Workout");
+import Workout from "../models/workout.js";
 
-exports.logWorkout = async (req, res) => {
+// Log a new workout
+export const logWorkout = async (req, res) => {
   try {
-    const workout = new Workout({ ...req.body, userId: req.user.userId });
+    const { type, duration, intensity, notes } = req.body;
+
+    const workout = new Workout({
+      user: req.user._id,
+      type,
+      duration,
+      intensity,
+      notes,
+    });
+
     await workout.save();
-    res.status(201).json({ message: "Workout logged successfully" });
+    res.status(201).json(workout);
   } catch (error) {
-    res.status(400).json({ message: "Failed to log workout" });
+    res.status(500).json({ message: error.message });
   }
 };
 
-exports.getWorkouts = async (req, res) => {
+// Get all workouts for a user
+export const getWorkouts = async (req, res) => {
   try {
-    const workouts = await Workout.find({ userId: req.user.userId }).sort({
-      date: -1,
-    });
-    res.json(workouts);
+    const workouts = await Workout.find({ user: req.user._id });
+    res.status(200).json(workouts);
   } catch (error) {
-    res.status(404).json({ message: "Workouts not found" });
+    res.status(500).json({ message: error.message });
   }
 };

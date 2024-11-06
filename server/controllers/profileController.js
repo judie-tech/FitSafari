@@ -9,9 +9,9 @@ const getProfile = async (req, res) => {
   }
 };
 
-const updateProfile = async (req, res) => {
+export const updateProfile = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.user.userId, req.body, {
+    const user = await User.findByIdAndUpdate(req.userId, req.body, {
       new: true,
       runValidators: true, // This ensures validation rules are applied
     });
@@ -29,5 +29,4 @@ const updateProfile = async (req, res) => {
 
 export default {
   getProfile,
-  updateProfile,
 };

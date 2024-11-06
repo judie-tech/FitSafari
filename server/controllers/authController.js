@@ -1,5 +1,5 @@
 import User from "../models/user.js";
-import { generateToken, verifyToken } from "../utilis/jwtUtils.js";
+import { generateToken } from "../utilis/jwtUtils.js";
 import bcrypt from "bcrypt";
 
 export const register = async (req, res) => {
@@ -31,11 +31,24 @@ export const login = async (req, res) => {
     }
 
     // Generate token
-    const token = generateToken(user);
-    console.log("Token generated:", token);
-    res.json({ token });
+    // const token = generateToken(res, user);
+    // console.log("Token generated:", token);
+    // res.json({ token });
+    generateToken(res, user); // No need to assign token since cookie is set in `generateToken`
+    console.log("Token cookie set successfully");
+    res.json({ message: "Login successful" });
   } catch (error) {
     console.error("Login error:", error.message);
     res.status(500).json({ message: "Login failed" });
+  }
+};
+export const checkAuth = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    console.log("Error:", error.message);
+    res.status(400).json({ success: false, message: error.message });
   }
 };
