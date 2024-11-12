@@ -6,7 +6,7 @@ export const logWorkout = async (req, res) => {
     const { type, duration, intensity, notes } = req.body;
 
     const workout = new Workout({
-      user: req.user._id,
+      user: req.userId,
       type,
       duration,
       intensity,
@@ -23,7 +23,7 @@ export const logWorkout = async (req, res) => {
 // Get all workouts for a user
 export const getWorkouts = async (req, res) => {
   try {
-    const workouts = await Workout.find({ user: req.user._id });
+    const workouts = await Workout.find({ user: req.userId });
     res.status(200).json(workouts);
   } catch (error) {
     res.status(500).json({ message: error.message });
