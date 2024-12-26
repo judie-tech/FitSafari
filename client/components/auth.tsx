@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { User, Lock, Mail, Facebook, Github } from 'lucide-react'
+import { User, Lock, Mail } from 'lucide-react'
 
 export function Auth({ onAuthSuccess }: { onAuthSuccess: (name: string) => void }) {
   const [isLogin, setIsLogin] = useState(true)
@@ -17,17 +17,19 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: (name: string) => void 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically handle the authentication logic
-    // For this example, we'll just simulate a successful auth
     onAuthSuccess(name || email.split('@')[0])
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-gray-800">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>{isLogin ? "Login" : "Sign Up"}</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl font-bold text-yellow-400 font-poppins">{isLogin ? "Login" : "Sign Up"}</CardTitle>
+          <CardDescription className="text-gray-400">
             {isLogin ? "Welcome back!" : "Create your account"}
           </CardDescription>
         </CardHeader>
@@ -118,21 +120,13 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: (name: string) => void 
             </TabsContent>
           </Tabs>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-4">
-          <Button className="w-full" onClick={handleSubmit}>
+        <CardFooter>
+          <Button className="w-full bg-yellow-400 text-navy-blue hover:bg-yellow-500" onClick={handleSubmit}>
             {isLogin ? "Login" : "Sign Up"}
           </Button>
-          <div className="flex justify-center space-x-4">
-            <Button variant="outline" size="icon">
-              <Facebook className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="icon">
-              <Github className="h-4 w-4" />
-            </Button>
-          </div>
         </CardFooter>
       </Card>
-    </div>
+    </motion.div>
   )
 }
 
