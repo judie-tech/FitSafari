@@ -15,14 +15,12 @@ import {
   Users,
   Bell,
 } from "lucide-react";
-import Dashboard from "@/components/dashboard";
-import WorkoutAndExercises from "@/components/workout-and-exercises";
-import DietPlanner from "@/components/diet-planner";
-import ProgressTracker from "@/components/progress-tracker";
-import CommunityHub from "@/components/community-hub";
-import Notifications from "@/components/notifications";
-import { Auth } from "@/components/auth";
+
+import Auth from "@/components/auth";
 import { ProfileSetup } from "@/components/profile-setup";
+import Dashboard from "@/components/dashboard";
+import { Sidebar } from "@/components/sidebar";
+import { Header } from "@/components/header";
 
 const navItems = [
   { icon: Home, label: "Dashboard", value: "dashboard" },

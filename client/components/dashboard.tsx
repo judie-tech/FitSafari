@@ -1,205 +1,134 @@
-"use client"
+import React from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Activity,
+  Dumbbell,
+  Target,
+  Flame,
+  Trophy,
+  TrendingUp,
+  Clock,
+} from "lucide-react";
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { Activity, Flame, Droplet, Scale, Utensils, Dumbbell } from 'lucide-react'
+const Dashboard = () => {
+  // Sample data - in a real app, this would come from your backend
+  const stats = [
+    {
+      label: "Workouts Completed",
+      value: "12",
+      icon: Activity,
+      trend: "+2 this week",
+    },
+    {
+      label: "Active Minutes",
+      value: "360",
+      icon: Flame,
+      trend: "+45 from last week",
+    },
+    {
+      label: "Current Streak",
+      value: "5 days",
+      icon: Trophy,
+      trend: "Personal best!",
+    },
+    { label: "Goals Met", value: "8/10", icon: Target, trend: "80% complete" },
+  ];
 
-const data = [
-  { name: 'Mon', calories: 2400, weight: 185 },
-  { name: 'Tue', calories: 2200, weight: 184 },
-  { name: 'Wed', calories: 2500, weight: 184 },
-  { name: 'Thu', calories: 2100, weight: 183 },
-  { name: 'Fri', calories: 2300, weight: 183 },
-  { name: 'Sat', calories: 2600, weight: 182 },
-  { name: 'Sun', calories: 2400, weight: 182 },
-]
-
-const statCards = [
-  { title: "Daily Steps", value: "8,439", icon: Activity, color: "text-green-400" },
-  { title: "Calories Burned", value: "384", icon: Flame, color: "text-orange-400" },
-  { title: "Water Intake", value: "2.5L", icon: Droplet, color: "text-blue-400" },
-  { title: "Current Weight", value: "182 lbs", icon: Scale, color: "text-purple-400" },
-]
-
-const motivationalQuotes = [
-  "The only bad workout is the one that didn't happen.",
-  "Your body can stand almost anything. It's your mind that you have to convince.",
-  "The pain you feel today will be the strength you feel tomorrow.",
-  "Fitness is not about being better than someone else. It's about being better than you used to be.",
-  "The hardest lift of all is lifting your butt off the couch.",
-]
-
-const recentWorkouts = [
-  { name: "Morning Run", duration: "30 mins" },
-  { name: "Yoga Session", duration: "45 mins" },
-  { name: "Weight Training", duration: "60 mins" },
-]
-
-const recentMeals = [
-  { name: "Healthy Breakfast", calories: 350 },
-  { name: "Protein-packed Lunch", calories: 450 },
-  { name: "Light Dinner", calories: 300 },
-]
-
-export default function Dashboard() {
-  const [currentQuote, setCurrentQuote] = useState(0)
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentQuote((prevQuote) => (prevQuote + 1) % motivationalQuotes.length)
-    }, 10000) // Change quote every 10 seconds
-
-    return () => clearInterval(timer)
-  }, [])
+  const recentWorkouts = [
+    { name: "Upper Body Strength", date: "2 days ago", duration: "45 mins" },
+    { name: "HIIT Cardio", date: "3 days ago", duration: "30 mins" },
+    { name: "Core Workout", date: "Yesterday", duration: "20 mins" },
+  ];
 
   return (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Card className="bg-gradient-to-r from-blue-600 to-blue-400">
-          <CardContent className="p-6">
-            <h2 className="text-2xl font-bold text-white mb-2">Welcome back!</h2>
-            <p className="text-white text-lg">
-              {motivationalQuotes[currentQuote]}
-            </p>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((stat, index) => (
-          <motion.div
-            key={stat.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-          >
-            <Card className="bg-blue-800">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-white">{stat.title}</CardTitle>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-white">{stat.value}</div>
-                <Progress value={70} className="mt-2" />
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-blue-800">
-          <CardHeader>
-            <CardTitle className="text-white">Weekly Progress</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={data}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#4a5568" />
-                  <XAxis dataKey="name" stroke="#e2e8f0" />
-                  <YAxis yAxisId="left" stroke="#e2e8f0" />
-                  <YAxis yAxisId="right" orientation="right" stroke="#e2e8f0" />
-                  <Tooltip contentStyle={{ backgroundColor: '#2a4365', border: 'none' }} />
-                  <Line yAxisId="left" type="monotone" dataKey="calories" stroke="#8884d8" activeDot={{ r: 8 }} />
-                  <Line yAxisId="right" type="monotone" dataKey="weight" stroke="#82ca9d" />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="space-y-6">
-          <Card className="bg-blue-800">
-            <CardHeader>
-              <CardTitle className="text-white">Recent Workouts</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-4">
-                {recentWorkouts.map((workout, index) => (
-                  <motion.li
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="flex items-center space-x-4 text-white"
-                  >
-                    <Dumbbell className="h-6 w-6 text-yellow-400" />
-                    <div>
-                      <p className="font-semibold">{workout.name}</p>
-                      <p className="text-sm text-gray-300">Duration: {workout.duration}</p>
-                    </div>
-                  </motion.li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-blue-800">
-            <CardHeader>
-              <CardTitle className="text-white">Recent Meals</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-4">
-                {recentMeals.map((meal, index) => (
-                  <motion.li
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="flex items-center space-x-4 text-white"
-                  >
-                    <Utensils className="h-6 w-6 text-yellow-400" />
-                    <div>
-                      <p className="font-semibold">{meal.name}</p>
-                      <p className="text-sm text-gray-300">Calories: {meal.calories}</p>
-                    </div>
-                  </motion.li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+      {/* Welcome Section */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-emerald-300">
+            Welcome to Your Fitness Journey
+          </h1>
+          <p className="text-emerald-200 mt-1">
+            Track your progress and crush your goals
+          </p>
+        </div>
+        <div className="flex items-center gap-2 bg-emerald-900/50 p-2 rounded-lg">
+          <Dumbbell className="h-5 w-5 text-emerald-400" />
+          <span className="text-emerald-300 font-medium">
+            Fitness Level: Intermediate
+          </span>
         </div>
       </div>
 
-      <Card className="bg-blue-800">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat, index) => (
+          <Card key={index} className="bg-emerald-900/50 border-emerald-600/20">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="p-2 bg-emerald-800/50 rounded-lg">
+                  <stat.icon className="h-5 w-5 text-emerald-400" />
+                </div>
+                <span className="text-sm text-emerald-400">{stat.trend}</span>
+              </div>
+              <div className="mt-3">
+                <p className="text-2xl font-bold text-emerald-300">
+                  {stat.value}
+                </p>
+                <p className="text-sm text-emerald-400">{stat.label}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Recent Activity */}
+      <Card className="bg-emerald-900/50 border-emerald-600/20">
         <CardHeader>
-          <CardTitle className="text-white">Goal Completion</CardTitle>
+          <CardTitle className="text-emerald-300">Recent Workouts</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div>
-              <div className="flex justify-between text-white mb-1">
-                <span>Daily Step Goal</span>
-                <span>8,439 / 10,000</span>
+            {recentWorkouts.map((workout, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 bg-emerald-800/30 rounded-lg"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-emerald-700/50 rounded-full">
+                    <Dumbbell className="h-4 w-4 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-emerald-300">
+                      {workout.name}
+                    </p>
+                    <p className="text-sm text-emerald-400">{workout.date}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-emerald-400" />
+                  <span className="text-emerald-300">{workout.duration}</span>
+                </div>
               </div>
-              <Progress value={84} className="h-2" />
-            </div>
-            <div>
-              <div className="flex justify-between text-white mb-1">
-                <span>Weekly Workout Goal</span>
-                <span>4 / 5 days</span>
-              </div>
-              <Progress value={80} className="h-2" />
-            </div>
-            <div>
-              <div className="flex justify-between text-white mb-1">
-                <span>Weight Loss Goal</span>
-                <span>7 / 10 lbs</span>
-              </div>
-              <Progress value={70} className="h-2" />
-            </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Progress Chart */}
+      <Card className="bg-emerald-900/50 border-emerald-600/20">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-emerald-300">Weekly Progress</CardTitle>
+          <TrendingUp className="h-4 w-4 text-emerald-400" />
+        </CardHeader>
+        <CardContent>
+          <div className="h-48 flex items-center justify-center text-emerald-400">
+            Progress chart will be displayed here
           </div>
         </CardContent>
       </Card>
     </div>
-  )
-}
+  );
+};
 
+export default Dashboard;
