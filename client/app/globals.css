@@ -67,11 +67,6 @@ body {
     --chart-5: 340 75% 55%;
   }
 }
-@layer base {
-  body {
-    @apply bg-gray-100 text-gray-600;
-  }
-}
 
 @layer base {
   * {

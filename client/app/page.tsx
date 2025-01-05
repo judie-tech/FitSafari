@@ -1,158 +1,96 @@
-// page
-"use client";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Activity,
-  BarChart2,
-  Home,
-  Utensils,
-  User,
-  LogOut,
-  Dumbbell,
-  Users,
-  Bell,
-} from "lucide-react";
+'use client'
 
-import Auth from "@/components/auth";
-import { ProfileSetup } from "@/components/profile-setup";
-import Dashboard from "@/components/dashboard";
-import { Sidebar } from "@/components/sidebar";
-import { Header } from "@/components/header";
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { ArrowRight, Mail, Lock, User } from 'lucide-react'
 
-const navItems = [
-  { icon: Home, label: "Dashboard", value: "dashboard" },
-  { icon: Dumbbell, label: "Workouts & Exercises", value: "workouts" },
-  { icon: Utensils, label: "Diet", value: "diet" },
-  { icon: BarChart2, label: "Progress", value: "progress" },
-  { icon: Users, label: "Community", value: "community" },
-  { icon: Bell, label: "Notifications", value: "notifications" },
-];
+export default function LoginPage() {
+  const [isLogin, setIsLogin] = useState(true)
+  const router = useRouter()
 
-export default function App() {
-  const [activeTab, setActiveTab] = useState("dashboard");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isProfileComplete, setIsProfileComplete] = useState(false);
-  const [userName, setUserName] = useState("");
-
-  const handleAuthSuccess = (name: string) => {
-    setIsAuthenticated(true);
-    setUserName(name);
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setIsProfileComplete(false);
-    setUserName("");
-  };
-
-  if (!isAuthenticated) {
-    return <Auth onAuthSuccess={handleAuthSuccess} />;
-  }
-
-  if (!isProfileComplete) {
-    return <ProfileSetup onComplete={() => setIsProfileComplete(true)} />;
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    // Here you would typically handle the login/signup logic
+    // For now, we'll just redirect to the profile setup page
+    router.push('/profile-setup')
   }
 
   return (
-    <div className="flex h-screen relative">
-      {/* Background */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[url('/images/bg.jpg')] bg-cover bg-center opacity-10" />
-        <div className="absolute inset-0 bg-gradient-to-br from-green-900 via-green-800 to-emerald-900 opacity-50" />
-      </div>
-
-      {/* Sidebar */}
-      <nav className="w-64 bg-emerald-950/50 backdrop-blur-lg p-4 relative z-10 border-r border-emerald-500/20">
-        <div className="mb-8 flex items-center gap-3">
-          <motion.div
-            whileHover={{ rotate: 5 }}
-            className="p-2 bg-emerald-500/20 rounded-full"
-          >
-            <Dumbbell className="h-6 w-6 text-emerald-400" />
-          </motion.div>
-          <h1 className="text-2xl font-bold text-emerald-400 font-poppins">
-            FitSafari
-          </h1>
-        </div>
-        <ul className="space-y-2">
-          {navItems.map((item) => (
-            <motion.li
-              key={item.value}
-              whileHover={{ x: 4 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <Button
-                variant={activeTab === item.value ? "secondary" : "ghost"}
-                className={`w-full justify-start ${
-                  activeTab === item.value
-                    ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                    : "text-emerald-100 hover:bg-emerald-500/10"
-                }`}
-                onClick={() => setActiveTab(item.value)}
-              >
-                <item.icon className="mr-2 h-4 w-4" />
-                {item.label}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-400 to-indigo-600">
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md"
+      >
+        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800 dark:text-white">Welcome to FitTrack</h1>
+        <Tabs defaultValue="login" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="login" onClick={() => setIsLogin(true)}>Login</TabsTrigger>
+            <TabsTrigger value="signup" onClick={() => setIsLogin(false)}>Sign Up</TabsTrigger>
+          </TabsList>
+          <TabsContent value="login">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Input id="email" type="email" placeholder="Enter your email" className="pl-10" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Input id="password" type="password" placeholder="Enter your password" className="pl-10" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                </div>
+              </div>
+              <Button type="submit" className="w-full">
+                Login
+                <ArrowRight className="ml-2" size={18} />
               </Button>
-            </motion.li>
-          ))}
-        </ul>
-        <motion.div
-          className="absolute bottom-4 w-[calc(100%-2rem)]"
-          whileHover={{ scale: 1.02 }}
-        >
-          <Button
-            variant="ghost"
-            onClick={handleLogout}
-            className="w-full justify-start text-emerald-100 hover:bg-emerald-500/10"
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Button>
-        </motion.div>
-      </nav>
-
-      {/* Main content */}
-      <main className="flex-1 overflow-auto relative z-10">
-        <header className="bg-emerald-950/50 backdrop-blur-lg p-4 flex justify-between items-center border-b border-emerald-500/20">
-          <h2 className="text-xl font-semibold font-poppins text-emerald-400">
-            {navItems.find((item) => item.value === activeTab)?.label}
-          </h2>
-          <div className="flex items-center space-x-4">
-            <span className="font-roboto text-emerald-100">Hi, {userName}</span>
-            <motion.div whileHover={{ scale: 1.05 }}>
-              <Avatar>
-                <AvatarImage src="/avatars/01.png" alt={userName} />
-                <AvatarFallback className="bg-emerald-500/20 text-emerald-400">
-                  {userName.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-            </motion.div>
-          </div>
-        </header>
-
-        <div className="p-6">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="bg-emerald-950/30 backdrop-blur-sm rounded-lg p-6 border border-emerald-500/20"
-            >
-              {activeTab === "dashboard" && <Dashboard />}
-              {activeTab === "workouts" && <WorkoutAndExercises />}
-              {activeTab === "diet" && <DietPlanner />}
-              {activeTab === "progress" && <ProgressTracker />}
-              {activeTab === "community" && <CommunityHub />}
-              {activeTab === "notifications" && <Notifications />}
-            </motion.div>
-          </AnimatePresence>
+            </form>
+          </TabsContent>
+          <TabsContent value="signup">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <div className="relative">
+                  <Input id="name" type="text" placeholder="Enter your full name" className="pl-10" />
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Input id="email" type="email" placeholder="Enter your email" className="pl-10" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Input id="password" type="password" placeholder="Create a password" className="pl-10" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                </div>
+              </div>
+              <Button type="submit" className="w-full">
+                Sign Up
+                <ArrowRight className="ml-2" size={18} />
+              </Button>
+            </form>
+          </TabsContent>
+        </Tabs>
+        <div className="mt-6 text-center">
+          <a href="#" className="text-sm text-indigo-600 hover:underline">Forgot password?</a>
         </div>
-      </main>
+      </motion.div>
     </div>
-  );
+  )
 }
+

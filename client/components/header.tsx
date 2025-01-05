@@ -1,56 +1,38 @@
-"use client";
+import { Bell, Search, User, Menu } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
-import { Bell, Search, User } from "lucide-react";
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-
-export function Header() {
+export function Header({ sidebarOpen, setSidebarOpen }) {
   return (
-    <motion.header
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="bg-white shadow-md"
-    >
-      <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          <motion.h1
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="text-2xl font-bold text-emerald-600"
-          >
-            FitTrack Pro
-          </motion.h1>
-          <div className="flex items-center">
-            <div className="relative mx-4">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="bg-gray-100 rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-            </div>
-            <Button
-              isIconOnly
-              color="success"
-              variant="light"
-              aria-label="Notifications"
-            >
-              <Bell className="h-6 w-6" />
-            </Button>
-            <Button
-              isIconOnly
-              color="success"
-              variant="light"
-              aria-label="User profile"
-              className="ml-2"
-            >
-              <User className="h-6 w-6" />
-            </Button>
-          </div>
-        </div>
+    <header className="flex items-center justify-between px-6 py-4 bg-white dark:bg-gray-800 shadow">
+      <div className="flex items-center">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="lg:hidden mr-2"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          <Menu className="h-6 w-6" />
+        </Button>
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">Welcome back, Alex!</h2>
       </div>
-    </motion.header>
-  );
+      <div className="flex items-center space-x-4">
+        <div className="relative">
+          <Input
+            type="text"
+            placeholder="Search..."
+            className="pl-10 pr-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+        </div>
+        <Button variant="ghost" size="icon" className="rounded-full">
+          <Bell size={20} />
+        </Button>
+        <Button variant="ghost" size="icon" className="rounded-full">
+          <User size={20} />
+        </Button>
+      </div>
+    </header>
+  )
 }
+
