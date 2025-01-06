@@ -1,16 +1,11 @@
-import mongoose from "mongoose"; // Import mongoose
+import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  fitnessGoals: { type: String },
-  age: { type: Number },
-  weight: { type: Number },
-  height: { type: Number },
-  activityLevel: { type: String },
-  dietaryPreferences: { type: String },
 });
 
 userSchema.pre("save", async function (next) {
