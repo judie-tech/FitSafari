@@ -1,181 +1,255 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
-import { ArrowRight, Dumbbell, Scale, Ruler, Calendar } from 'lucide-react'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ArrowRight, Calendar, Quote } from "lucide-react";
+
+const motivationalQuotes = [
+  { quote: "Your health is your wealth.", author: "Unknown" },
+  { quote: "Every journey begins with a single step.", author: "Lao Tzu" },
+  {
+    quote: "Believe you can and you're halfway there.",
+    author: "Theodore Roosevelt",
+  },
+];
 
 export default function ProfileSetupPage() {
-  const [step, setStep] = useState(1)
-  const router = useRouter()
+  const [step, setStep] = useState(1);
+  const router = useRouter();
+  const [currentQuote, setCurrentQuote] = useState(0);
 
-  const nextStep = () => {
+  const nextStep = (e) => {
+    e.preventDefault();
     if (step < 3) {
-      setStep(step + 1)
+      setStep((prevStep) => prevStep + 1);
+      setCurrentQuote((prev) => (prev + 1) % motivationalQuotes.length);
     } else {
-      // Redirect to dashboard after completing profile setup
-      router.push('/dashboard')
+      router.push("/dashboard");
     }
-  }
+  };
+
+  const fadeInUpVariants = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 },
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-400 to-indigo-600 p-4">
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-400 to-green-600 p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-2xl"
+        className="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl w-full max-w-2xl relative overflow-hidden"
       >
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800 dark:text-white">Set Up Your Profile</h1>
-        <div className="mb-8 flex justify-between">
+        <h1 className="text-4xl font-bold text-center mb-6 text-gray-800 dark:text-white">
+          Profile Setup
+        </h1>
+
+        <p className="text-center mb-4 text-gray-600 dark:text-gray-300">
+          This information will help us personalize your workouts and meal
+          plans.
+        </p>
+
+        <div className="mb-8 flex justify-between relative">
           {[1, 2, 3].map((i) => (
-            <div key={i} className={`w-1/3 h-2 rounded-full ${i <= step ? 'bg-indigo-600' : 'bg-gray-200'}`} />
+            <motion.div
+              key={i}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: i * 0.2 }}
+              className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                i <= step
+                  ? "bg-emerald-500 text-white"
+                  : "bg-gray-200 text-gray-600"
+              }`}
+            >
+              {i}
+            </motion.div>
           ))}
+          <div className="absolute top-1/2 left-0 w-full h-2 -z-10 transform -translate-y-1/2">
+            <div
+              className={`h-full bg-emerald-500 transition-all duration-500`}
+              style={{ width: `${((step - 1) / 2) * 100}%` }}
+            />
+          </div>
         </div>
-        {step === 1 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Basic Information</h2>
-            <form className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="dob">Date of Birth</Label>
-                <div className="relative">
-                  <Input id="dob" type="date" className="pl-10" />
-                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+
+        <motion.div
+          key={currentQuote}
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -50 }}
+          className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800"
+        >
+          <div className="flex items-start gap-2">
+            <Quote className="text-emerald-500 flex-shrink-0 mt-1" size={20} />
+            <div>
+              <p className="text-emerald-800 dark:text-emerald-200 italic">
+                "{motivationalQuotes[currentQuote].quote}"
+              </p>
+              <p className="text-emerald-600 dark:text-emerald-400 text-sm mt-1">
+                - {motivationalQuotes[currentQuote].author}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        <AnimatePresence mode="wait">
+          {step === 1 && (
+            <motion.div
+              key="step1"
+              variants={fadeInUpVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+                Personal Information
+              </h2>
+              <form className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="dob">Date of Birth</Label>
+                  <div className="relative group">
+                    <Input id="dob" type="date" className="pl-10" />
+                    <Calendar
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-500"
+                      size={18}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Gender</Label>
-                <RadioGroup defaultValue="male" className="flex space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="male" id="male" />
-                    <Label htmlFor="male">Male</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="female" id="female" />
-                    <Label htmlFor="female">Female</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="other" id="other" />
-                    <Label htmlFor="other">Other</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-              <Button onClick={nextStep} className="w-full">
-                Next
+                <div className="space-y-2">
+                  <Label htmlFor="height">Height (cm)</Label>
+                  <Input
+                    id="height"
+                    type="number"
+                    placeholder="Enter your height"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="weight">Weight (kg)</Label>
+                  <Input
+                    id="weight"
+                    type="number"
+                    placeholder="Enter your weight"
+                  />
+                </div>
+                <Button
+                  onClick={nextStep}
+                  className="w-full bg-emerald-500 hover:bg-emerald-600"
+                >
+                  Next Step
+                  <ArrowRight className="ml-2" size={18} />
+                </Button>
+              </form>
+            </motion.div>
+          )}
+
+          {step === 2 && (
+            <motion.div
+              key="step2"
+              variants={fadeInUpVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+                Fitness Goals
+              </h2>
+              <RadioGroup>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="loseWeight" id="loseWeight" />
+                  <Label
+                    htmlFor="loseWeight"
+                    className="text-gray-800 dark:text-white"
+                  >
+                    Lose Weight
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="gainMuscle" id="gainMuscle" />
+                  <Label
+                    htmlFor="gainMuscle"
+                    className="text-gray-800 dark:text-white"
+                  >
+                    Gain Muscle
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="improveStamina" id="improveStamina" />
+                  <Label
+                    htmlFor="improveStamina"
+                    className="text-gray-800 dark:text-white"
+                  >
+                    Improve Stamina
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="generalFitness" id="generalFitness" />
+                  <Label
+                    htmlFor="generalFitness"
+                    className="text-gray-800 dark:text-white"
+                  >
+                    General Fitness
+                  </Label>
+                </div>
+              </RadioGroup>
+              <Button
+                onClick={nextStep}
+                className="w-full bg-emerald-500 hover:bg-emerald-600"
+              >
+                Next Step
                 <ArrowRight className="ml-2" size={18} />
               </Button>
-            </form>
-          </motion.div>
-        )}
-        {step === 2 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Physical Information</h2>
-            <form className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="height">Height (cm)</Label>
-                <div className="relative">
-                  <Input id="height" type="number" placeholder="Enter your height" className="pl-10" />
-                  <Ruler className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="weight">Weight (kg)</Label>
-                <div className="relative">
-                  <Input id="weight" type="number" placeholder="Enter your weight" className="pl-10" />
-                  <Scale className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Activity Level</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your activity level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="sedentary">Sedentary</SelectItem>
-                    <SelectItem value="light">Lightly Active</SelectItem>
-                    <SelectItem value="moderate">Moderately Active</SelectItem>
-                    <SelectItem value="very">Very Active</SelectItem>
-                    <SelectItem value="extra">Extra Active</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button onClick={nextStep} className="w-full">
-                Next
+            </motion.div>
+          )}
+
+          {step === 3 && (
+            <motion.div
+              key="step3"
+              variants={fadeInUpVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+                Dietary Preferences
+              </h2>
+              <Select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select your dietary preference" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="vegan">Vegan</SelectItem>
+                  <SelectItem value="vegetarian">Vegetarian</SelectItem>
+                  <SelectItem value="pescatarian">Pescatarian</SelectItem>
+                  <SelectItem value="keto">Keto</SelectItem>
+                  <SelectItem value="noPreference">No Preference</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                onClick={nextStep}
+                className="w-full mt-4 bg-emerald-500 hover:bg-emerald-600"
+              >
+                Finish Setup
                 <ArrowRight className="ml-2" size={18} />
               </Button>
-            </form>
-          </motion.div>
-        )}
-        {step === 3 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Fitness Goals</h2>
-            <form className="space-y-4">
-              <div className="space-y-2">
-                <Label>Primary Goal</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your primary goal" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="lose">Lose Weight</SelectItem>
-                    <SelectItem value="maintain">Maintain Weight</SelectItem>
-                    <SelectItem value="gain">Gain Weight</SelectItem>
-                    <SelectItem value="muscle">Build Muscle</SelectItem>
-                    <SelectItem value="endurance">Improve Endurance</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Weekly Exercise Goal (hours)</Label>
-                <div className="flex items-center space-x-4">
-                  <Dumbbell className="text-gray-400" size={18} />
-                  <Slider defaultValue={[5]} max={20} step={1} className="flex-1" />
-                  <span className="text-gray-600 dark:text-gray-300 w-8 text-center">5</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Dietary Preference</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your dietary preference" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="no_preference">No Preference</SelectItem>
-                    <SelectItem value="vegetarian">Vegetarian</SelectItem>
-                    <SelectItem value="vegan">Vegan</SelectItem>
-                    <SelectItem value="keto">Keto</SelectItem>
-                    <SelectItem value="paleo">Paleo</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button onClick={nextStep} className="w-full">
-                Complete Setup
-                <ArrowRight className="ml-2" size={18} />
-              </Button>
-            </form>
-          </motion.div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </div>
-  )
+  );
 }
-
