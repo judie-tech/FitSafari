@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ArrowRight, Calendar, Quote } from "lucide-react";
+import { toast } from "sonner";
 
 const motivationalQuotes = [
   { quote: "Your health is your wealth.", author: "Unknown" },
@@ -25,18 +26,91 @@ const motivationalQuotes = [
   },
 ];
 
+const API_BASE_URL = "http://localhost:5002/api";
+
 export default function ProfileSetupPage() {
   const [step, setStep] = useState(1);
   const router = useRouter();
   const [currentQuote, setCurrentQuote] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [profileData, setProfileData] = useState({
+    firstName: "",
+    lastName: "",
+    dateOfBirth: "",
+    height: "",
+    weight: "",
+    fitnessGoal: "",
+    dietaryPreference: "",
+  });
 
-  const nextStep = (e) => {
+  // Fetch existing profile data if available
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/profile`, {
+          credentials: "include", // Important for cookies
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setProfileData((prevData) => ({
+            ...prevData,
+            ...data,
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setProfileData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/profile/updateProfile`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        credentials: "include",
+        body: JSON.stringify(profileData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+
+      toast.success("Profile updated successfully!");
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("Failed to update profile. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const nextStep = async (e) => {
     e.preventDefault();
     if (step < 3) {
       setStep((prevStep) => prevStep + 1);
       setCurrentQuote((prev) => (prev + 1) % motivationalQuotes.length);
     } else {
-      router.push("/dashboard");
+      await handleSubmit();
     }
   };
 
@@ -58,11 +132,7 @@ export default function ProfileSetupPage() {
           Profile Setup
         </h1>
 
-        <p className="text-center mb-4 text-gray-600 dark:text-gray-300">
-          This information will help us personalize your workouts and meal
-          plans.
-        </p>
-
+        {/* Progress Steps */}
         <div className="mb-8 flex justify-between relative">
           {[1, 2, 3].map((i) => (
             <motion.div
@@ -81,12 +151,13 @@ export default function ProfileSetupPage() {
           ))}
           <div className="absolute top-1/2 left-0 w-full h-2 -z-10 transform -translate-y-1/2">
             <div
-              className={`h-full bg-emerald-500 transition-all duration-500`}
+              className="h-full bg-emerald-500 transition-all duration-500"
               style={{ width: `${((step - 1) / 2) * 100}%` }}
             />
           </div>
         </div>
 
+        {/* Motivational Quote */}
         <motion.div
           key={currentQuote}
           initial={{ opacity: 0, x: 50 }}
@@ -107,6 +178,7 @@ export default function ProfileSetupPage() {
           </div>
         </motion.div>
 
+        {/* Form Steps */}
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div
@@ -121,34 +193,43 @@ export default function ProfileSetupPage() {
               </h2>
               <form className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="dob">Date of Birth</Label>
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    value={profileData.firstName}
+                    onChange={handleInputChange}
+                    placeholder="Enter your first name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    value={profileData.lastName}
+                    onChange={handleInputChange}
+                    placeholder="Enter your last name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="dateOfBirth">Date of Birth</Label>
                   <div className="relative group">
-                    <Input id="dob" type="date" className="pl-10" />
+                    <Input
+                      id="dateOfBirth"
+                      type="date"
+                      className="pl-10"
+                      value={profileData.dateOfBirth}
+                      onChange={handleInputChange}
+                    />
                     <Calendar
                       className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-500"
                       size={18}
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="height">Height (cm)</Label>
-                  <Input
-                    id="height"
-                    type="number"
-                    placeholder="Enter your height"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="weight">Weight (kg)</Label>
-                  <Input
-                    id="weight"
-                    type="number"
-                    placeholder="Enter your weight"
-                  />
-                </div>
                 <Button
                   onClick={nextStep}
                   className="w-full bg-emerald-500 hover:bg-emerald-600"
+                  disabled={loading}
                 >
                   Next Step
                   <ArrowRight className="ml-2" size={18} />
@@ -166,53 +247,38 @@ export default function ProfileSetupPage() {
               exit="exit"
             >
               <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
-                Fitness Goals
+                Physical Information
               </h2>
-              <RadioGroup>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="loseWeight" id="loseWeight" />
-                  <Label
-                    htmlFor="loseWeight"
-                    className="text-gray-800 dark:text-white"
-                  >
-                    Lose Weight
-                  </Label>
+              <form className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="height">Height (cm)</Label>
+                  <Input
+                    id="height"
+                    type="number"
+                    value={profileData.height}
+                    onChange={handleInputChange}
+                    placeholder="Enter your height"
+                  />
                 </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="gainMuscle" id="gainMuscle" />
-                  <Label
-                    htmlFor="gainMuscle"
-                    className="text-gray-800 dark:text-white"
-                  >
-                    Gain Muscle
-                  </Label>
+                <div className="space-y-2">
+                  <Label htmlFor="weight">Weight (kg)</Label>
+                  <Input
+                    id="weight"
+                    type="number"
+                    value={profileData.weight}
+                    onChange={handleInputChange}
+                    placeholder="Enter your weight"
+                  />
                 </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="improveStamina" id="improveStamina" />
-                  <Label
-                    htmlFor="improveStamina"
-                    className="text-gray-800 dark:text-white"
-                  >
-                    Improve Stamina
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="generalFitness" id="generalFitness" />
-                  <Label
-                    htmlFor="generalFitness"
-                    className="text-gray-800 dark:text-white"
-                  >
-                    General Fitness
-                  </Label>
-                </div>
-              </RadioGroup>
-              <Button
-                onClick={nextStep}
-                className="w-full bg-emerald-500 hover:bg-emerald-600"
-              >
-                Next Step
-                <ArrowRight className="ml-2" size={18} />
-              </Button>
+                <Button
+                  onClick={nextStep}
+                  className="w-full bg-emerald-500 hover:bg-emerald-600"
+                  disabled={loading}
+                >
+                  Next Step
+                  <ArrowRight className="ml-2" size={18} />
+                </Button>
+              </form>
             </motion.div>
           )}
 
@@ -225,27 +291,78 @@ export default function ProfileSetupPage() {
               exit="exit"
             >
               <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
-                Dietary Preferences
+                Preferences
               </h2>
-              <Select>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select your dietary preference" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="vegan">Vegan</SelectItem>
-                  <SelectItem value="vegetarian">Vegetarian</SelectItem>
-                  <SelectItem value="pescatarian">Pescatarian</SelectItem>
-                  <SelectItem value="keto">Keto</SelectItem>
-                  <SelectItem value="noPreference">No Preference</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button
-                onClick={nextStep}
-                className="w-full mt-4 bg-emerald-500 hover:bg-emerald-600"
-              >
-                Finish Setup
-                <ArrowRight className="ml-2" size={18} />
-              </Button>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label>Fitness Goal</Label>
+                  <RadioGroup
+                    value={profileData.fitnessGoal}
+                    onValueChange={(value) =>
+                      handleInputChange({
+                        target: { id: "fitnessGoal", value },
+                      })
+                    }
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="loseWeight" id="loseWeight" />
+                      <Label htmlFor="loseWeight">Lose Weight</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="gainMuscle" id="gainMuscle" />
+                      <Label htmlFor="gainMuscle">Gain Muscle</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem
+                        value="improveStamina"
+                        id="improveStamina"
+                      />
+                      <Label htmlFor="improveStamina">Improve Stamina</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem
+                        value="generalFitness"
+                        id="generalFitness"
+                      />
+                      <Label htmlFor="generalFitness">General Fitness</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Dietary Preference</Label>
+                  <Select
+                    value={profileData.dietaryPreference}
+                    onValueChange={(value) =>
+                      handleInputChange({
+                        target: { id: "dietaryPreference", value },
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your dietary preference" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="vegan">Vegan</SelectItem>
+                      <SelectItem value="vegetarian">Vegetarian</SelectItem>
+                      <SelectItem value="pescatarian">Pescatarian</SelectItem>
+                      <SelectItem value="keto">Keto</SelectItem>
+                      <SelectItem value="noPreference">
+                        No Preference
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Button
+                  onClick={nextStep}
+                  className="w-full bg-emerald-500 hover:bg-emerald-600"
+                  disabled={loading}
+                >
+                  {loading ? "Saving..." : "Complete Setup"}
+                  <ArrowRight className="ml-2" size={18} />
+                </Button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
