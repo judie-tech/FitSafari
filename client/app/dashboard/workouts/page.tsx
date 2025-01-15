@@ -24,12 +24,21 @@ import {
   Target,
   Search,
   PlayCircle,
+  Scale,
+  Trophy,
+  Activity,
 } from "lucide-react";
 
 export default function WorkoutsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [date, setDate] = useState(new Date());
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [userGoals] = useState({
+    weightGoal: "180",
+    calorieGoal: "2500",
+    weeklyWorkouts: "4",
+    currentStreak: "5",
+  });
 
   const workouts = [
     {
@@ -37,34 +46,24 @@ export default function WorkoutsPage() {
       duration: "30 min",
       calories: 300,
       intensity: "High",
+      muscleGroups: ["Legs", "Core"],
+      progress: "2/4 weekly sessions",
     },
     {
       name: "Upper Body Strength",
       duration: "45 min",
       calories: 200,
       intensity: "Medium",
-    },
-    { name: "Yoga Flow", duration: "60 min", calories: 150, intensity: "Low" },
-  ];
-
-  const suggestedWorkouts = [
-    {
-      name: "Core Strength",
-      duration: "20 min",
-      target: "Abs & Core",
-      difficulty: "Medium",
+      muscleGroups: ["Chest", "Back", "Arms"],
+      progress: "Personal Best: 185lbs bench",
     },
     {
-      name: "Lower Body Power",
-      duration: "40 min",
-      target: "Legs",
-      difficulty: "Hard",
-    },
-    {
-      name: "Recovery Stretch",
-      duration: "25 min",
-      target: "Full Body",
-      difficulty: "Easy",
+      name: "Yoga Flow",
+      duration: "60 min",
+      calories: 150,
+      intensity: "Low",
+      muscleGroups: ["Full Body"],
+      progress: "Improved Flexibility +20%",
     },
   ];
 
@@ -74,18 +73,30 @@ export default function WorkoutsPage() {
       category: "Chest",
       difficulty: "Medium",
       equipment: "Barbell",
+      personalBest: "185 lbs",
+      targetMuscles: ["Chest", "Triceps", "Shoulders"],
+      videoUrl: "#",
+      properForm: "Keep back flat on bench, feet planted...",
     },
     {
       name: "Deadlift",
       category: "Back",
       difficulty: "Hard",
       equipment: "Barbell",
+      personalBest: "275 lbs",
+      targetMuscles: ["Lower Back", "Hamstrings", "Glutes"],
+      videoUrl: "#",
+      properForm: "Maintain neutral spine, push through heels...",
     },
     {
       name: "Bodyweight Squats",
       category: "Legs",
       difficulty: "Easy",
       equipment: "None",
+      personalBest: "50 reps",
+      targetMuscles: ["Quadriceps", "Glutes", "Core"],
+      videoUrl: "#",
+      properForm: "Keep chest up, knees tracking over toes...",
     },
   ];
 
@@ -96,6 +107,62 @@ export default function WorkoutsPage() {
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         <main className="flex-1 overflow-y-auto p-4">
           <div className="max-w-7xl mx-auto">
+            {/* Goals Overview Section */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <Card className="bg-emerald-50 dark:bg-emerald-900/50">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-2">
+                    <Scale className="w-4 h-4 text-emerald-600" />
+                    <div>
+                      <p className="text-sm text-emerald-600">Weight Goal</p>
+                      <p className="text-lg font-bold">
+                        {userGoals.weightGoal} lbs
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-emerald-50 dark:bg-emerald-900/50">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-2">
+                    <Flame className="w-4 h-4 text-emerald-600" />
+                    <div>
+                      <p className="text-sm text-emerald-600">Daily Calories</p>
+                      <p className="text-lg font-bold">
+                        {userGoals.calorieGoal} cal
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-emerald-50 dark:bg-emerald-900/50">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-2">
+                    <Activity className="w-4 h-4 text-emerald-600" />
+                    <div>
+                      <p className="text-sm text-emerald-600">Weekly Goal</p>
+                      <p className="text-lg font-bold">
+                        {userGoals.weeklyWorkouts} workouts
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-emerald-50 dark:bg-emerald-900/50">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-2">
+                    <Trophy className="w-4 h-4 text-emerald-600" />
+                    <div>
+                      <p className="text-sm text-emerald-600">Current Streak</p>
+                      <p className="text-lg font-bold">
+                        {userGoals.currentStreak} days
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-3xl font-bold text-emerald-900 dark:text-emerald-100">
                 Workouts
@@ -150,15 +217,22 @@ export default function WorkoutsPage() {
                             </Select>
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="intensity">Intensity Level</Label>
+                            <Label htmlFor="muscle-groups">
+                              Target Muscle Groups
+                            </Label>
                             <Select>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select intensity" />
+                                <SelectValue placeholder="Select muscles" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="low">Low</SelectItem>
-                                <SelectItem value="medium">Medium</SelectItem>
-                                <SelectItem value="high">High</SelectItem>
+                                <SelectItem value="chest">Chest</SelectItem>
+                                <SelectItem value="back">Back</SelectItem>
+                                <SelectItem value="legs">Legs</SelectItem>
+                                <SelectItem value="arms">Arms</SelectItem>
+                                <SelectItem value="core">Core</SelectItem>
+                                <SelectItem value="fullBody">
+                                  Full Body
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -184,26 +258,28 @@ export default function WorkoutsPage() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="sets">Sets/Reps</Label>
+                            <Label htmlFor="personal-record">
+                              Personal Record
+                            </Label>
                             <Input
-                              id="sets"
-                              placeholder="3x12"
+                              id="personal-record"
+                              placeholder="Weight/Reps/Time"
                               className="border-emerald-200"
                             />
                           </div>
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="notes">Notes</Label>
+                          <Label htmlFor="notes">Notes & Progress</Label>
                           <Input
                             id="notes"
-                            placeholder="Add workout notes..."
+                            placeholder="Track your progress, feelings, and achievements..."
                             className="border-emerald-200"
                           />
                         </div>
 
                         <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
-                          Log Workout
+                          Log Workout & Update Goals
                         </Button>
                       </form>
                     </TabsContent>
@@ -216,59 +292,27 @@ export default function WorkoutsPage() {
                           onSelect={setDate}
                           className="rounded-md border border-emerald-200"
                         />
-                        <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
-                          Schedule Workout
-                        </Button>
+                        <div className="space-y-4">
+                          <Label>Recommended Workout for Selected Date</Label>
+                          <div className="p-4 bg-emerald-50 dark:bg-emerald-900/50 rounded-lg">
+                            <p className="font-medium">Upper Body Focus</p>
+                            <p className="text-sm text-emerald-600">
+                              Based on your recent leg day and recovery pattern
+                            </p>
+                          </div>
+                          <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
+                            Schedule Workout
+                          </Button>
+                        </div>
                       </div>
                     </TabsContent>
                   </Tabs>
                 </CardContent>
               </Card>
 
-              {/* Right Column - Recent & Suggested Workouts */}
+              {/* Right Column */}
               <div className="space-y-6">
-                {/* Recent Workouts */}
-                <Card>
-                  <CardHeader className="border-b border-emerald-100 dark:border-emerald-800">
-                    <CardTitle className="text-emerald-800 dark:text-emerald-100">
-                      Recent Workouts
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-4">
-                    <ul className="space-y-3">
-                      {workouts.map((workout, index) => (
-                        <li
-                          key={index}
-                          className="p-3 bg-emerald-50 dark:bg-emerald-900/50 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900 transition-colors"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                              <div className="p-2 bg-emerald-200 dark:bg-emerald-800 rounded-lg">
-                                <Dumbbell className="w-4 h-4 text-emerald-700 dark:text-emerald-300" />
-                              </div>
-                              <div className="ml-3">
-                                <p className="font-medium text-emerald-900 dark:text-emerald-100">
-                                  {workout.name}
-                                </p>
-                                <div className="flex items-center text-sm text-emerald-600 dark:text-emerald-400">
-                                  <Clock className="w-3 h-3 mr-1" />
-                                  <span>{workout.duration}</span>
-                                  <Flame className="w-3 h-3 ml-2 mr-1" />
-                                  <span>{workout.calories} cal</span>
-                                </div>
-                              </div>
-                            </div>
-                            <span className="text-xs font-medium px-2 py-1 rounded-full bg-emerald-200 dark:bg-emerald-800 text-emerald-700 dark:text-emerald-300">
-                              {workout.intensity}
-                            </span>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-
-                {/* Exercise Database Quick Access */}
+                {/* Exercise Database */}
                 <Card>
                   <CardHeader className="border-b border-emerald-100 dark:border-emerald-800">
                     <CardTitle className="text-emerald-800 dark:text-emerald-100">
@@ -310,6 +354,9 @@ export default function WorkoutsPage() {
                               </p>
                               <p className="text-sm text-emerald-600 dark:text-emerald-400">
                                 {exercise.category} • {exercise.equipment}
+                              </p>
+                              <p className="text-xs text-emerald-500">
+                                Personal Best: {exercise.personalBest}
                               </p>
                             </div>
                             <PlayCircle className="w-5 h-5 text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
